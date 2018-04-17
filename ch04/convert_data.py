@@ -1,3 +1,15 @@
+
+try:
+    sc and spark
+except NameError as e:
+    import findspark
+    findspark.init()
+    import pyspark
+    import pyspark.sql
+    
+    sc = pyspark.SparkContext()
+    spark = pyspark.sql.SparkSession(sc).builder.appName("testtttt").getOrCreate()
+    
 # Loads CSV with header parsing and type inference, in one line!
 on_time_dataframe = spark.read.format('com.databricks.spark.csv')\
   .options(
