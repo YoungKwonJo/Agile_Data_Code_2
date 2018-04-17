@@ -5,12 +5,13 @@ from bson import json_util
 import config
 import json
 
-from pyelasticsearch import ElasticSearch
-elastic = ElasticSearch(config.ELASTIC_URL)
+from elasticsearch5 import Elasticsearch
+elastic = Elasticsearch(config.ELASTIC_URL)
 
 # Process elasticsearch hits and return flights records
 def process_search(results):
   records = []
+  total = 0
   if results['hits'] and results['hits']['hits']:
     total = results['hits']['total']
     hits = results['hits']['hits']
@@ -115,10 +116,11 @@ def search_flights():
   nav_offsets = get_navigation_offsets(start, end, config.RECORDS_PER_PAGE)
   
   # Build the base of our elasticsearch query
-  query = {
+  query2 = {
     'query': {
       'bool': {
-        'must': []}
+        'must': []
+      }
     },
     'sort': [
       {'FlightDate': {'order': 'asc', 'ignore_unmapped' : True} },
@@ -130,6 +132,8 @@ def search_flights():
     'from': start,
     'size': config.RECORDS_PER_PAGE
   }
+  query= {"query": { "bool" : { "must": [] } } } 
+
   
   # Add any search parameters present
   if carrier:
@@ -147,9 +151,10 @@ def search_flights():
   
   # Query elasticsearch, process to get records and count
   print("QUERY")
-  print(carrier, flight_date, origin, dest, tail_number, flight_number)
+  #print(carrier, flight_date, origin, dest, tail_number, flight_number)
   print(json.dumps(query))
-  results = elastic.search(query)
+  results = elastic.search(body=query)
+  print(results)
   flights, flight_count = process_search(results)
   
   # Persist search parameters in the form template
@@ -168,5 +173,5 @@ def search_flights():
     )
 
 if __name__ == "__main__":
-  app.run(debug=True)
+  app.run(debug=True,host='0.0.0.0')
 
