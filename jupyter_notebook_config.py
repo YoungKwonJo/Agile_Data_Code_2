@@ -7,6 +7,6 @@ c.NotebookApp.ip = '*'
 # Don't open browser by default
 c.NotebookApp.open_browser = False  
 # Fix port to 8888
-c.NotebookApp.port = 8888
+c.NotebookApp.port = 8877
 # Disable token authentication
 c.NotebookApp.token = ""
